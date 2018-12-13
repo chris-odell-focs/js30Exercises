@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scoped CSS Variables and JS</title>
+</head>
+<body>
+  <h2>Update CSS Variables with <span class='hl'>JS</span></h2>
+
+  <div class="controls">
+    <label for="spacing">Spacing:</label>
+    <input id="spacing" type="range" name="spacing" min="10" max="200" value="10" data-sizing="px">
+
+    <label for="blur">Blur:</label>
+    <input id="blur" type="range" name="blur" min="0" max="25" value="10" data-sizing="px">
+
+    <label for="base">Base Color</label>
+    <input id="base" type="color" name="base" value="#ffc600">
+  </div>
+
+  <img src="https://source.unsplash.com/7bwQXzbF6KE/800x500">
+
+  <style>
+
+    /*
+      misc styles, nothing to do with CSS variables
+    */
+
+    :root {
+        --blurAmount: 10px;
+        --spacing: 10px;
+        --backColour: #4cff00;
+    }
+
+    body {
+      text-align: center;
+      background: #193549;
+      color: white;
+      font-family: 'helvetica neue', sans-serif;
+      font-weight: 100;
+      font-size: 50px;
+    }
+
+    .controls {
+      margin-bottom: 50px;
+    }
+
+    input {
+      width: 100px;
+    }
+
+      img {
+          background-color: var(--backColour);
+          filter: blur(var(--blurAmount));
+          padding: var(--spacing);
+      }
+
+  </style>
+
+  <script>
+
+      const targetImg = document.getElementsByTagName('img')[0];
+
+      function setSpacing() {
+
+          document.documentElement.style.setProperty(`--spacing`, this.value + 'px');
+
+      };
+
+      function setBlur() {
+
+          document.documentElement.style.setProperty(`--blurAmount`, this.value + 'px');
+      };
+
+      function setColour() {
+          document.documentElement.style.setProperty(`--backColour`, this.value);
+      };
+
+      function attachSpacingAdjust() {
+
+          var spacingAdjuster = document.getElementById('spacing');
+          spacingAdjuster.addEventListener('change', setSpacing);
+          spacingAdjuster.addEventListener('mousemove', setSpacing);
+      };
+
+      function attachBlurAdjust() {
+
+          var blurAdjust = document.getElementById('blur');
+          blurAdjust.addEventListener('change', setBlur);
+          blurAdjust.addEventListener('mousemove', setBlur);
+
+      };
+
+      function attachColourAdjust() {
+
+          var colourAdjust = document.getElementById('base');
+          colourAdjust.addEventListener('change', setColour);
+          colourAdjust.addEventListener('mousemove', setColour);
+
+      };
+
+      attachSpacingAdjust();
+      attachBlurAdjust();
+      attachColourAdjust();
+
+  </script>
+
+</body>
+</html>
