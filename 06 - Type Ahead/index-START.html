@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+    const searchInput = document.querySelector('input.search');
+    const suggestions = document.querySelector('ul.suggestions');
+
+    const cities = [];
+
+    fetch(endpoint)
+        .then((data) => data.json())
+        .then((data2) => data2.map((item) => cities.push(item)));
+
+    searchInput.addEventListener('keydown', performSearch);
+
+    const numberFormatter = new Intl.NumberFormat('en-GB', { useGrouping: true });
+
+    function performSearch(e) {
+
+        if (e.keyCode > 31 && e.keyCode < 91) {
+
+            const citiesFound = cities.filter((cityItem) => cityItem.city.toLowerCase().includes(e.key.toLowerCase()));
+            let allLis = suggestions.querySelectorAll('li');
+            allLis.forEach(li => li.remove());
+
+            console.table(citiesFound);
+            citiesFound.forEach(cf => suggestions.innerHTML += `<li><span>${cf.city}</span><span class="">` + numberFormatter.format(cf.population) + `</span></li>`);
+            
+        }
+
+    };
+
+</script>
+</body>
+</html>
