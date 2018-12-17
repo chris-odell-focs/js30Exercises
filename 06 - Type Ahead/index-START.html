@@ -32,16 +32,32 @@
 
     function performSearch(e) {
 
+        var newHTML = '<li></li>';
         if (e.keyCode > 31 && e.keyCode < 91) {
 
-            const citiesFound = cities.filter((cityItem) => cityItem.city.toLowerCase().includes(e.key.toLowerCase()));
+            const filterValue = searchInput.value;
+
+            const filterItem = searchInput.value;
+            const citiesFound = cities.filter((cityItem) =>
+                cityItem.city.toLowerCase().includes(filterValue.toLowerCase()) || 
+                cityItem.state.toLowerCase().includes(filterValue.toLowerCase())
+            );           
             let allLis = suggestions.querySelectorAll('li');
             allLis.forEach(li => li.remove());
 
-            console.table(citiesFound);
-            citiesFound.forEach(cf => suggestions.innerHTML += `<li><span>${cf.city}</span><span class="">` + numberFormatter.format(cf.population) + `</span></li>`);
+            newHTML = '';
+
+
+            citiesFound.forEach(cf => {
+                const cityName = cf.city.replace(filterValue, `<span class="hl">${filterValue}</span>`);
+                const stateName = cf.state.replace(filterValue, `<span class="hl">${filterValue}</span>`);;
+
+                newHTML += `<li class="name"><span>${cityName}, ${stateName}</span><span class="population">` + numberFormatter.format(cf.population) + `</span></li>`
+            });
             
         }
+
+        suggestions.innerHTML = newHTML;
 
     };
 
