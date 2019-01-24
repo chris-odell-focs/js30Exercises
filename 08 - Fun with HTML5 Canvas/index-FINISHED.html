@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+
+/* Initialise the canvas and context */
+
+const canvas = document.querySelector('#draw');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+ctx.strokeStyle = '#BADA55';
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
+ctx.lineWidth = 100;
+// ctx.globalCompositeOperation = 'multiply';
+
+/* Set up the way we want the code to behave */
+ var changeLineWidth = (function (ctxa) {
+     return function (dir) {
+         if (dir) {
+             ctxa.lineWidth++;
+         } else {
+             ctxa.lineWidth--;
+         }
+    };
+ }(ctx));
+
+ var getDirection = (function (ctxa) {
+
+    let direction = true;
+
+    return function (lineWidth) {
+        if (ctxa.lineWidth >= 100 || ctxa.lineWidth <= 1) {
+            direction = !direction;
+        }
+        return direction;
+    };
+}(ctx));
+
+var changeHue = (function (ctxa) {
+    let hue = 0;
+    return function () {
+        hue++;
+        if (hue >= 360) {
+            hue = 0;
+        }
+
+        ctxa.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+    }
+}(ctx));
+
+var doDraw = (function (ctxa, can) {
+
+    let lastX = 0;
+    let lastY = 0;
+
+    can.addEventListener('mousedown', (e) => {       
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+    
+    return function (newX, newY) {
+
+        ctxa.beginPath();
+        ctxa.moveTo(lastX, lastY);
+        ctxa.lineTo(newX, newY);
+        ctxa.stroke();
+        [lastX, lastY] = [newX, newY];
+    };
+
+}(ctx, canvas));
+
+var whenDrawing = (function (can, _doDraw) {
+
+    let isDrawing = false;
+    can.addEventListener('mouseup', () => isDrawing = false);
+    can.addEventListener('mouseout', () => isDrawing = false);
+    can.addEventListener('mousedown', () => isDrawing = true);
+
+    return function (e) {
+
+        if (isDrawing) {
+            _doDraw(e.offsetX, e.offsetY);
+        }
+
+        return { then: function (cb) { if(isDrawing){ cb(); } } };
+    };
+
+}(canvas, doDraw));
+
+
+/* Execute the behaviours when the mouse moves */
+canvas.addEventListener('mousemove', function (e) {
+    whenDrawing(e).then(function () {
+        changeHue();
+        changeLineWidth(getDirection(ctx.lineWidth));
+    })
+});
+
+
+</script>
+
+<style>
+  html, body {
+    margin: 0;
+  }
+</style>
+
+</body>
+</html>
