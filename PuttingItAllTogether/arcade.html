@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Splat the Aliens. The more Aliens the more points.</title>
+</head>
+<body>
+    <div class="main">
+        <nav id="main-nav">
+            <div class="dropdownBackground">
+                <span class="arrow"></span>
+            </div>
+            <ul class="menu">
+                <li>
+                    <a href="#">How To Play</a>
+                    <div class="dropdown dropdown1">
+                        <div class="howtoplay">
+                            <p>
+
+                                Drag 'n' drop the barriers[the black squares] strategically to give you some protection as
+                                the aliens drop, before the first countdown from 10 seconds finishes.
+                                Hit as many Aliens as you can before the second countdown from 1 minute finishes.
+                                1 Point for every alien hit.
+                                -1 point for every alien that reaches the bottom.
+                                Use the arrow keys to move your spaceship left and right.
+                                Use the z key to fire at the aliens.
+
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <a href="#">Game options</a>
+                    <ul class="dropdown options">
+                        <li><a id="ar-level1" href="#">Level 1</a></li>
+                        <li><a id="ar-level2" href="#">Level 2</a></li>
+                        <li><a id="ar-level3" href="#">Level 3</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div id="barrier-template" style="display:none">
+            <div class="barrier-layer">
+                <div class="barrier-body"></div>
+                <div class="barrier-body"></div>
+                <div class="barrier-body"></div>
+            </div>
+            <div class="barrier-layer">
+                <div class="barrier-body"></div>
+                <div class="barrier-body"></div>
+                <div class="barrier-body"></div>
+            </div>
+            <div class="barrier-layer">
+                <div class="barrier-body"></div>
+                <div class="barrier-body"></div>
+                <div class="barrier-body"></div>
+            </div>
+        </div>
+        <div id="ammo-template" style="display:none"></div>
+        <div id="alien-template" class="" style="display:none">
+            <div class="alien-body-top"></div>
+            <div class="alien-body-mid"></div>
+            <div class="alien-body-low"></div>
+            <div class="alien-leg-l"></div>
+            <div class="alien-leg-r"></div>
+        </div>
+        <div id="game-board">
+            <div id="score-card">Score:<span>0</span></div>
+            <div id="countdown-timer">00:00</div>
+            <div id="spaceship" style="top: 430px;"><div id="spaceship-top"></div><div id="spaceship-body"></div></div>
+        </div>
+    </div>
+    <style>
+        /* taken from webos javascript 30 course https://javascript30.com/ - Follow along nav */
+
+        html {
+            box-sizing: border-box;
+            font-family: "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            min-height: 800vh;
+            background: #0c0355;
+        }
+
+        h2 {
+            margin-top: 0;
+            padding-top: .8em;
+        }
+
+        nav {
+            position: relative;
+            perspective: 600px;
+        }
+
+        .menu > li > a {
+            color: #2200ff;
+            text-decoration: none;
+            font-size: 20px;
+            padding: 10px 20px;
+            display: inline-block;
+            margin: 20px;
+            border-radius: 5px;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 20px 0px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .menu li {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            z-index: 99999;
+        }
+
+
+        .dropdown {
+            opacity: 0;
+            position: absolute;
+            overflow: hidden;
+            padding: 20px;
+            top: -20px;
+            border-radius: 2px;
+            transition: all 0.5s;
+            transform: translateY(100px);
+            will-change: opacity;
+            display: none;
+        }
+
+        .trigger-enter .dropdown {
+            display: block;
+        }
+
+        .trigger-enter-active .dropdown {
+            opacity: 1;
+        }
+
+        .dropdownBackground {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 50px 100px rgba(50,50,93,.1), 0 15px 35px rgba(50,50,93,.15), 0 5px 15px rgba(0,0,0,.1);
+            transition: all 0.3s, opacity 0.1s, transform 0.2s;
+            transform-origin: 50% 0;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            z-index: 9999;
+        }
+
+            .dropdownBackground.open {
+                opacity: 1;
+            }
+
+        .arrow {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            display: block;
+            background: white;
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .howtoplay {
+            min-width: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.7;
+        }
+
+        .options {
+            min-width: 300px;
+        }
+
+            .options li {
+                padding: 10px 0;
+                display: block;
+                border-bottom: 1px solid rgba(0,0,0,0.2);
+            }
+
+        .dropdown a {
+            text-decoration: none;
+            color: #ffc600;
+        }
+
+        /* Game board  */
+
+        #game-board {
+            position: relative;
+            width: 50%;
+            height: 500px;
+            margin: 0 25%;
+            border: 1px solid #f1f2f3;
+            background-color: #88611b;
+        }
+
+        /* countdown-timer */
+        #countdown-timer {
+            font-size: 4em;
+            position: absolute;
+            right: 30px;
+        }
+
+        #score-card {
+            font-size: 4em;
+            position: absolute;
+            left: 30px;
+        }
+
+        /* spaceship */
+        #spaceship {
+            position: absolute;
+        }
+
+        #spaceship-top {
+            width: 12px;
+            height: 10px;
+            background-color: #000;
+            margin: 0 27%;
+        }
+
+        #spaceship-body {
+            width: 26px;
+            height: 26px;
+            background-color: #000;
+        }
+
+        /* barrier */
+
+        .barrier,
+        .barrier-layer,
+        .barrier-body {
+            background-color: #000;
+        }
+
+        .barrier {
+            position: absolute;
+            left: 500px;
+            top: 200px;
+            width: 65px;
+            height: 54px;
+        }
+
+        .barrier-body {
+            display: inline-block;
+        }
+
+        /* ammo-item */
+        .ammo-item {
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            background-color: #000;
+        }
+
+        /* alien */
+        .alien {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            z-index: 1;
+        }
+
+        .alien-body-top {
+            margin: 0 25%;
+            background-color: #000;
+            height: 10px;
+        }
+
+        .alien-body-mid {
+            background-color: #000;
+            width: 100%;
+            height: 10px;
+        }
+
+        .alien-body-low {
+            background-color: #000;
+            margin: 0 15%;
+            height: 10px;
+        }
+
+        .alien-leg-l {
+            background-color: #000;
+            width: 10px;
+            height: 10px;
+        }
+
+        .alien-leg-r {
+            background-color: #000;
+            width: 10px;
+            height: 10px;
+            right: 0px;
+            float: right;
+            margin-top: -10px;
+        }
+    </style>
+    <script src="arcade.js"></script>
+</body>
+</html>
